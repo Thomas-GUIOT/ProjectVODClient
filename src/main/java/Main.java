@@ -1,20 +1,21 @@
 
-
+import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.List;
 import java.util.Scanner;
 
 import exceptions.InvalidCredentialsException;
 
-public class Main implements IClientBox {
+public class Main {
 
     public static void main(String[] args) {
 
     	try {
 			Registry registry = LocateRegistry.getRegistry(2001);
-	    	IConnection iConnection = (IConnection) registry.lookup("JSP");
+	    	IConnection iConnection = (IConnection) registry.lookup("connectionVOD");
 	    	
 	    	Scanner scanner = new Scanner(System.in);
 
@@ -44,14 +45,17 @@ public class Main implements IClientBox {
 		    		
 		    		notFinished = false;
 	    		} catch(InvalidCredentialsException e) {
-	    			
+					e.printStackTrace();
 	    		}
 	    	}
 	    	
-	    	ivodService.viewCatalog();
-	    	
+	    	List<MovieDesc> movies = ivodService.viewCatalog();
+			System.out.println(movies.toString());
+
+			Bill bill =	ivodService.playmovie("9781234567897",new ClientBox());
+			System.out.println(bill.toString());
 	    	scanner.close();
-    	} catch (RemoteException | NotBoundException e) {
+    	} catch (RemoteException | NotBoundException | MalformedURLException e) {
 			e.printStackTrace();
 		}
     }
@@ -61,15 +65,7 @@ public class Main implements IClientBox {
     	String password;
     	boolean notFinished = true;
     	while(notFinished) {
-    		
+
     	}
     }
-
-    
-    
-	@Override
-	public void stream(byte[] chunck) {
-		// TODO Auto-generated method stub
-		
-	}
 }
