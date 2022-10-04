@@ -13,9 +13,10 @@ import exceptions.SignInFailed;
 public class Client {
 
     public static void main(String[] args) {
+    	
     	try {
 			Registry registry = LocateRegistry.getRegistry(2001);
-	    	IConnection iConnection = (IConnection) registry.lookup("JSP");
+	    	IConnection iConnection = (IConnection) registry.lookup("connectionVOD");
 	    	
 	    	Scanner scanner = new Scanner(System.in);
 
@@ -31,11 +32,11 @@ public class Client {
     	System.out.println("Hello, welcome on the VODProject.");
     	while(true) {
     		System.out.println("Choose what you want to do :");
-    		System.out.println("- If you want to register first type -> register");
     		System.out.println("- If you want to leave type -> leave");
-	    	System.out.println("- If you want to login type anything");
+	    	System.out.println("- If you want to login type -> login");
+    		System.out.println("- If you want to register first type -> register");
 	    	
-	    	String input = scanner.next();
+	    	String input = scanner.nextLine();
 	    	if(input.equals("leave")) {
 	    		System.out.println("Goodbye thanks you for visiting our project.");
 	    		break;
@@ -43,8 +44,11 @@ public class Client {
 	    	else if(input.equals("register")) {
 	    		register(scanner, iConnection);
     		}
-	    	else {
+	    	else if(input.equals("login")) {
 	    		login(scanner, iConnection);
+	    	}
+	    	else {
+    			System.err.println("Invalid command, try again.\n\n");
 	    	}
     	}
     	
@@ -57,10 +61,10 @@ public class Client {
     	while(true) {
     		try {
         		System.out.println("Enter an email :");
-        		email = scanner.next();
+        		email = scanner.nextLine();
         		
         		System.out.println("Enter a password :");
-        		password = scanner.next();
+        		password = scanner.nextLine();
         		
 				iConnection.signIn(email, password);
 				
@@ -71,9 +75,10 @@ public class Client {
 				System.err.println("An error occured during the registration : " + e.getMessage());
 				System.out.println("- If you want to try again type -> again");
 				System.out.println("- If you want to go back to the main menu type anything.");
-				if(!scanner.next().equals("again")) {
+				if(!scanner.nextLine().equals("again")) {
 					return false;
 				}
+				System.out.println("\n\n");
 			}
     	}
     }
@@ -84,10 +89,10 @@ public class Client {
     	while(true) {
     		try {
 	    		System.out.println("Enter your email :");
-	    		email = scanner.next();
+	    		email = scanner.nextLine();
 	    		
 	    		System.out.println("Enter your password :");
-	    		password = scanner.next();
+	    		password = scanner.nextLine();
 	    		
 				IVODService ivodService = iConnection.login(email, password);
 				
@@ -101,10 +106,10 @@ public class Client {
 				System.err.println("An error occured during the login : " + e.getMessage());
 				System.out.println("- If you want to try again type -> again");
 				System.out.println("- If you want to go back to the main menu type anything.");
-				if(!scanner.next().equals("again")) {
+				if(!scanner.nextLine().equals("again")) {
 					return false;
 				}
-				e.printStackTrace();
+				System.out.println("\n\n");
 			}
     	}
 	}
@@ -113,24 +118,24 @@ public class Client {
     	String input;
     	while(true) {
     		System.out.println("Choose what you want to do :");
-    		System.out.println("- If you want to leave type -> leave");
     		System.out.println("- If you want to see the movie catalog type -> catalog");
     		System.out.println("- If you want to play a movie type -> play <ISBN>");
-    		
-    		input = scanner.next();
-    		
+    		System.out.println("- If you want to leave type -> leave");
+
+    		input = scanner.nextLine();
     		if(input.equals("leave")) {
     			return;
     		}
     		else if(input.equals("catalog")) {
     			showCatalog(ivodService.viewCatalog());
     		}
-    		else if(input.matches("^play[ \t]\\d+$")) {
+    		else if(input.matches("^play[ \t]\\d+\n?$")) {
     			try {
-        			String[] inputs = input.split("[ \t]");
-					ivodService.playmovie(inputs[1], new ClientBox());
+    				String[] inputs = input.split(" ");
+					Bill bill = ivodService.playmovie(inputs[1], new ClientBox());
+					System.out.println("Factured bill :\n" + bill.toString());
 				} catch (NotBoundException e) {
-					System.err.println("");
+					e.printStackTrace();
 					//TODO
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
@@ -138,12 +143,12 @@ public class Client {
 				}
     		}
     		else {
-    			System.err.println("Invalid command, try again.");
+    			System.err.println("Invalid command, try again.\n\n");
     		}
     	}
     }
     
     private static void showCatalog(List<MovieDesc> movies) {
-    	Arrays.toString(movies.toArray());//TODO to improve
+    	System.out.println(Arrays.toString(movies.toArray()));//TODO to improve
     }
 }
