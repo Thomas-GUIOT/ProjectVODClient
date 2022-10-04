@@ -136,11 +136,11 @@ public class Client {
     				else {
     					System.err.println("This ID does not exist, please use the number provided in the catalog.\n\n");
     				}
-					
+
 				} catch (NotBoundException | MalformedURLException e) {
 					System.err.println("An error occured during the retrieving of the movie : " + e.getMessage());
 					System.out.println("\n\n");
-				} 
+				}
     		}
     		else {
     			System.err.println("Invalid command, try again.\n\n");
@@ -154,7 +154,7 @@ public class Client {
 				+ " :\n\tPrice : " + movieDesc.getPrice() + "\n\tSynopsis : " + movieDesc.getSynopsis()));
 		System.out.println("\n");
     }
-    
+
     private static Map<Integer, MovieDesc> convertToMap(List<MovieDesc> movies){
     	Map<Integer, MovieDesc> result = new HashMap<>();
     	int i = 1;
