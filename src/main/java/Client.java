@@ -3,8 +3,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import exceptions.InvalidCredentialsException;
@@ -73,12 +74,8 @@ public class Client {
 				return true;
 			} catch (RemoteException | SignInFailed e) {
 				System.err.println("An error occured during the registration : " + e.getMessage());
-				System.out.println("- If you want to try again type -> again");
-				System.out.println("- If you want to go back to the main menu type anything.");
-				if(!scanner.nextLine().equals("again")) {
-					return false;
-				}
 				System.out.println("\n\n");
+				return false;
 			}
     	}
     }
@@ -96,30 +93,28 @@ public class Client {
 	    		
 				IVODService ivodService = iConnection.login(email, password);
 				
-				System.out.println("Login successful !");
-				System.out.println("You have gained access to VODProject.");
+				System.out.println("\n\nLogin successful !");
+				System.out.println("You have gained access to VODProject.\n");
 				
 				mainMenu(scanner, ivodService);
 				System.out.println("Disconnection successful.");
 				return true;
 			} catch (RemoteException | InvalidCredentialsException e) {
 				System.err.println("An error occured during the login : " + e.getMessage());
-				System.out.println("- If you want to try again type -> again");
-				System.out.println("- If you want to go back to the main menu type anything.");
-				if(!scanner.nextLine().equals("again")) {
-					return false;
-				}
 				System.out.println("\n\n");
+				return false;
 			}
     	}
 	}
     
     private static void mainMenu(Scanner scanner, IVODService ivodService) throws RemoteException {
     	String input;
+    	Map<Integer, MovieDesc> moviesMap = convertToMap(ivodService.viewCatalog());
+    	showCatalog(moviesMap);
     	while(true) {
     		System.out.println("Choose what you want to do :");
-    		System.out.println("- If you want to see the movie catalog type -> catalog");
-    		System.out.println("- If you want to play a movie type -> play <ISBN>");
+    		System.out.println("- If you want to play a movie type -> play [ID]");
+    		System.out.println("- If you want to see the movie catalog again type -> catalog");
     		System.out.println("- If you want to leave type -> leave");
 
     		input = scanner.nextLine();
@@ -127,20 +122,25 @@ public class Client {
     			return;
     		}
     		else if(input.equals("catalog")) {
-    			showCatalog(ivodService.viewCatalog());
+    			moviesMap = convertToMap(ivodService.viewCatalog());
+    			showCatalog(moviesMap);
     		}
     		else if(input.matches("^play[ \t]\\d+\n?$")) {
     			try {
     				String[] inputs = input.split(" ");
-					Bill bill = ivodService.playmovie(inputs[1], new ClientBox());
-					System.out.println("Factured bill :\n" + bill.toString());
-				} catch (NotBoundException e) {
-					e.printStackTrace();
-					//TODO
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-					//TODO
-				}
+    				MovieDesc choosenFilm = moviesMap.get(Integer.valueOf(inputs[1]));
+    				if(choosenFilm != null) {
+    					Bill bill = ivodService.playmovie(choosenFilm.getIsbn(), new ClientBox());
+    					System.out.println("Factured price : " + bill.getOutrageousPrice());
+    				}
+    				else {
+    					System.err.println("This ID does not exist, please use the number provided in the catalog.\n\n");
+    				}
+					
+				} catch (NotBoundException | MalformedURLException e) {
+					System.err.println("An error occured during the retrieving of the movie : " + e.getMessage());
+					System.out.println("\n\n");
+				} 
     		}
     		else {
     			System.err.println("Invalid command, try again.\n\n");
@@ -148,7 +148,19 @@ public class Client {
     	}
     }
     
-    private static void showCatalog(List<MovieDesc> movies) {
-    	System.out.println(Arrays.toString(movies.toArray()));//TODO to improve
+    private static void showCatalog(Map<Integer, MovieDesc> movies) {
+    	System.out.println("List of all available movies :");
+		movies.forEach((id, movieDesc) -> System.out.println("- [" + id + "] " + movieDesc.getMovieName()
+				+ " :\n\tPrice : " + movieDesc.getPrice() + "\n\tSynopsis : " + movieDesc.getSynopsis()));
+		System.out.println("\n");
+    }
+    
+    private static Map<Integer, MovieDesc> convertToMap(List<MovieDesc> movies){
+    	Map<Integer, MovieDesc> result = new HashMap<>();
+    	int i = 1;
+		for (MovieDesc movieDesc : movies) {
+			result.put(i++, movieDesc);
+		}
+		return result;
     }
 }
