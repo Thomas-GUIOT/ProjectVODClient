@@ -131,7 +131,7 @@ public class Client {
     				MovieDesc choosenFilm = moviesMap.get(Integer.valueOf(inputs[1]));
     				if(choosenFilm != null) {
     					Bill bill = ivodService.playmovie(choosenFilm.getIsbn(), new ClientBox());
-    					System.out.println("Factured price : " + bill.getOutrageousPrice());
+    					System.out.println("Factured price : " + bill.getOutrageousPrice() + " $");
     				}
     				else {
     					System.err.println("This ID does not exist, please use the number provided in the catalog.\n\n");
