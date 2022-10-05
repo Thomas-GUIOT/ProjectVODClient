@@ -47,7 +47,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>Server</mainClass>
+                    <mainClass>Client</mainClass>
                 </configuration>
             </plugin>
     	</plugins>

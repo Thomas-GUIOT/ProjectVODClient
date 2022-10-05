@@ -52,59 +52,53 @@ public class Client {
     			System.err.println("Invalid command, try again.\n\n");
 	    	}
     	}
-    	
-    	
     }
 
 	private static boolean register(Scanner scanner, IConnection iConnection) {
     	String email;
     	String password;
-    	while(true) {
-    		try {
-        		System.out.println("Enter an email :");
-        		email = scanner.nextLine();
-        		
-        		System.out.println("Enter a password :");
-        		password = scanner.nextLine();
-        		
-				iConnection.signIn(email, password);
-				
-				System.out.println("Registration successful !");
-				System.out.println("You can now login.");
-				return true;
-			} catch (RemoteException | SignInFailed e) {
-				System.err.println("An error occured during the registration : " + e.getMessage());
-				System.out.println("\n\n");
-				return false;
-			}
-    	}
+		try {
+    		System.out.println("Enter an email :");
+    		email = scanner.nextLine();
+    		
+    		System.out.println("Enter a password :");
+    		password = scanner.nextLine();
+    		
+			iConnection.signIn(email, password);
+			
+			System.out.println("Registration successful !");
+			System.out.println("You can now login.");
+			return true;
+		} catch (RemoteException | SignInFailed e) {
+			System.err.println("An error occured during the registration : " + e.getMessage());
+			System.out.println("\n\n");
+			return false;
+		}
     }
 
     private static boolean login(Scanner scanner, IConnection iConnection) {
     	String email;
     	String password;
-    	while(true) {
-    		try {
-	    		System.out.println("Enter your email :");
-	    		email = scanner.nextLine();
-	    		
-	    		System.out.println("Enter your password :");
-	    		password = scanner.nextLine();
-	    		
-				IVODService ivodService = iConnection.login(email, password);
-				
-				System.out.println("\n\nLogin successful !");
-				System.out.println("You have gained access to VODProject.\n");
-				
-				mainMenu(scanner, ivodService);
-				System.out.println("Disconnection successful.");
-				return true;
-			} catch (RemoteException | InvalidCredentialsException e) {
-				System.err.println("An error occured during the login : " + e.getMessage());
-				System.out.println("\n\n");
-				return false;
-			}
-    	}
+		try {
+    		System.out.println("Enter your email :");
+    		email = scanner.nextLine();
+    		
+    		System.out.println("Enter your password :");
+    		password = scanner.nextLine();
+    		
+			IVODService ivodService = iConnection.login(email, password);
+			
+			System.out.println("\n\nLogin successful !");
+			System.out.println("You have gained access to VODProject.\n");
+			
+			mainMenu(scanner, ivodService);
+			System.out.println("Disconnection successful.");
+			return true;
+		} catch (RemoteException | InvalidCredentialsException e) {
+			System.err.println("An error occured during the login : " + e.getMessage());
+			System.out.println("\n\n");
+			return false;
+		}
 	}
     
     private static void mainMenu(Scanner scanner, IVODService ivodService) throws RemoteException {
